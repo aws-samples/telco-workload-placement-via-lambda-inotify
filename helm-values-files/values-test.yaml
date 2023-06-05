@@ -1,0 +1,84 @@
+# Default values for open5gs-epc-helm.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+open5gs:
+  image:
+    repository: REPLACE_WITH_ECR_REPO_DETAILS
+    pullPolicy: IfNotPresent #Always #IfNotPresent
+    tag: "v2.5.6-inotify"   
+
+k8swait:
+   repository: groundnuty/k8s-wait-for
+   pullPolicy: IfNotPresent
+   tag: "v1.4"
+
+webui:
+  image:
+    repository: REPLACE_WITH_ECR_REPO_DETAILS
+    pullPolicy: IfNotPresent
+    tag: "v2.5.6"
+  ingress:
+    enabled: false
+    ## Ingress annotations done as key:value pairs
+    ## For a full list of possible ingress annotations, please see
+    ## ref: https://github.com/kubernetes/ingress-nginx/blob/master/docs/user-guide/nginx-configuration/annotations.md
+    ##
+    ## If tls is set to true, annotation ingress.kubernetes.io/secure-backends: "true" will automatically be set
+    # annotations:
+    #   kubernetes.io/ingress.class: nginx
+
+    hosts:
+      - name: open5gs-epc.local
+        paths: ["/"]
+        ## Set this to true in order to enable TLS on the ingress record
+        tls: false
+
+        ## Optionally specify the TLS hosts for the ingress record
+        ## Useful when the Ingress controller supports www-redirection
+        ## If not specified, the above host name will be used
+        # tlsHosts:
+        # - www.open5gs-epc.local
+        # - open5gs-epc.local
+
+        ## If TLS is set to true, you can declare what secret will store the key/certificate for TLS
+        # tlsSecret: open5gs-epc.local-tls    
+
+dnn: internet  
+
+config:
+  amf:
+    amfPort: "38412"
+    guamiList:
+    - plmn_id:
+        mcc: "208"
+        mnc: "93"
+      amf_id:
+        region: "2"
+        set: "1"
+    taiList:
+    - plmn_id:
+        mcc: "208"
+        mnc: "93"
+      tac: [5, 6, 7]
+    plmnList:
+    - plmn_id:
+        mcc: "208"
+        mnc: "93"
+      s_nssai:
+        - sst: 1
+          sd: 1
+        - sst: 1
+          sd: 3
+        - sst: 2
+          sd: 5            
+
+  nssf:
+    nsiList:
+    - addr: ""
+      port: 80
+      sst: 1
+      sd: 1    
+# Primary/Native kubernetes interface
+k8s:
+ interface: eth0

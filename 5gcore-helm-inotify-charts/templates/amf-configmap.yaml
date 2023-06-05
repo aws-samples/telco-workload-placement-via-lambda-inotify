@@ -1,0 +1,38 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Release.Name }}-amf-config
+  labels:
+    epc-mode: amf
+data:
+  amf.yaml: |
+    logger:
+        file: /var/log/open5gs/amf.log
+        #level: trace
+        #domain: sbi
+
+    amf:
+        sbi:
+        - addr: 0.0.0.0
+          advertise: {{ .Release.Name }}-amf
+        ngap:
+          dev: {{ .Values.k8s.interface }}         
+        guami:
+          {{ toYaml .Values.config.amf.guamiList | nindent 10 | trim }}
+        tai:
+          {{ toYaml .Values.config.amf.taiList | nindent 10 | trim }}
+        plmn_support:
+          {{ toYaml .Values.config.amf.plmnList | nindent 10 | trim }}
+        security:
+            integrity_order : [ NIA2, NIA1, NIA0 ]
+            ciphering_order : [ NEA0, NEA1, NEA2 ]
+        network_name:
+            full: Open5GS
+        amf_name: open5gs-amf0
+    metrics:
+      - addr: 0.0.0.0
+        port: 9090
+
+    nrf:
+     sbi:
+       name: {{ .Release.Name }}-nrf
